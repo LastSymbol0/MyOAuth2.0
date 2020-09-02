@@ -24,7 +24,7 @@ namespace OAuthClient.Services
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            if (!HasAccess())
+            if (context.Request.Path.Value.Equals("/ApplyCode"))
             {
                 StringValues code;
                 if (context.Request.Query.TryGetValue("code", out code))
