@@ -1,0 +1,15 @@
+﻿@*@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Allow this client to get access to your protected resources?</h1>
+
+    <ul>
+        <li>Client id: @ViewBag.ClientId</li>
+        <li>Responce type: @ViewBag.responceType</li>
+        <li>Redirect url: @ViewBag.redirectUrl</li>
+    </ul>
+
+    <p><a href="@ViewBag.redirectUrl">Allow</a>   |   <a href="http://google.com">Deny</a></p>
+</div>*@

@@ -1,0 +1,46 @@
+﻿@model bool
+
+@{
+    ViewData["Title"] = "Home Page";
+    string color = Model ? "text-success" : "text-danger";
+
+    string[] resources = new string[4]
+    {
+        ViewBag.Res1 == null ? "Access denied" : ViewBag.Res1,
+        ViewBag.Res2 == null ? "Access denied" : ViewBag.Res2,
+        ViewBag.Res3 == null ? "Access denied" : ViewBag.Res3,
+        ViewBag.Res4 == null ? "Access denied" : ViewBag.Res4,
+    };
+
+    string[] resourcesColors = new string[4]
+    {
+        ViewBag.Res1 == null ? "text-danger" : "text-success",
+        ViewBag.Res2 == null ? "text-danger" : "text-success",
+        ViewBag.Res3 == null ? "text-danger" : "text-success",
+        ViewBag.Res4 == null ? "text-danger" : "text-success",
+    };
+
+}
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <h2>I'm the client app, developed to show the power of OAuth</h2>
+
+        <br />
+
+        <h3 class="@color">
+            Has token: @Model
+        </h3>
+
+        <br />
+
+        <p id="pr-1" class="@resourcesColors[0]"> Resource 1: @resources[0]</p>
+        <p id="pr-2" class="@resourcesColors[1]"> Resource 2: @resources[1]</p>
+        <p id="pr-3" class="@resourcesColors[2]"> Resource 3: @resources[2]</p>
+        <p id="pr-4" class="@resourcesColors[3]"> Resource 4: @resources[3]</p>
+        @*<img src="https://sadanduseless.b-cdn.net/wp-content/uploads/2020/07/dark-stock-photos3.jpg" />*@
+        <br />
+
+        <a class="btn text-dark bg-info" asp-area="" asp-controller="Home" asp-action="Redirection">Press here to give me access to protected resources</a>
+
+    </div>

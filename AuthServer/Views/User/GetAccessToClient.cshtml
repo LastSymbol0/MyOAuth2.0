@@ -1,0 +1,71 @@
+﻿@model AuthServer.Models.GivingAccessPage.GivingAccessModel
+
+@{
+    ViewData["Title"] = "Giving Access Page";
+}
+
+    <div class="text-center">
+        <h1 class="display-4">Allow this client to get access to your protected resources?</h1>
+
+        <style>
+            input {
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+
+            a {
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+        </style>
+
+        @*<div class="d-flex justify-content-around">
+            <ul>
+                <li>Client id: @Model.ClientInfo.ClientId</li>
+                <li>Responce type: @Model.ClientInfo.ResponceType</li>
+                <li>Redirect url: @Model.ClientInfo.RedirectUrl</li>
+            </ul>
+        </div>*@
+
+
+        <div class="d-flex justify-content-around">
+            @using (Html.BeginForm())
+            {
+                @Html.HiddenFor(m => m.ClientInfo.ClientId)
+                @Html.HiddenFor(m => m.ClientInfo.RedirectUrl)
+                @Html.HiddenFor(m => m.ClientInfo.ResponceType)
+                <table>
+                    <tr>
+                        <td><p>Access level 1 </p></td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.AccessParameters.Scope1Access)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><p>Access level 2 </p></td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.AccessParameters.Scope2Access)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><p> Access level 3 </p></td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.AccessParameters.Scope3Access)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><p> Access level 4 </p></td>
+                        <td>
+                            @Html.CheckBoxFor(m => m.AccessParameters.Scope4Access)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input class="btn btn-success" type="submit" value="Allow" /> </td>
+
+                        <td><a class="btn btn-danger" href="@Model.ClientInfo.RedirectUrl">Deny</a> </td>
+                    </tr>
+                </table>
+            }
+        </div>
+
+    </div>
