@@ -15,14 +15,11 @@ namespace OAuthClient.Services
 {
     public class TokenHandler : IMiddleware
     {
-        private readonly ILogger<TokenHandler> _logger;
+        private readonly ClientConfig Сonfig;
 
-        private readonly ClientConfig config;
-
-        public TokenHandler(ILogger<TokenHandler> logger, ClientConfig clientConfig)
+        public TokenHandler(ClientConfig clientConfig)
         {
-            _logger = logger;
-            config = clientConfig;
+            Сonfig = clientConfig;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -45,10 +42,10 @@ namespace OAuthClient.Services
             {
                 new KeyValuePair<string, string>("code", code),
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                new KeyValuePair<string, string>("redirect_uri", config.MyRedirectURL),
+                new KeyValuePair<string, string>("redirect_uri", Сonfig.MyRedirectURL),
             };
 
-            Token = await HttpUtils.PostFormUrlEncoded(config.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(config.ClientId, config.ClientSecret)}");
+            Token = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
         }
 
         public bool HasAccess() => !String.IsNullOrEmpty(Token);

@@ -13,44 +13,39 @@ namespace OAuthClient.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ClientConfig Config;
 
-        private readonly ClientConfig config;
+        private readonly TokenHandler TokenHandler;
+        private readonly ResourcesHandler ResourcesHandler;
 
-        private readonly TokenHandler tokenHandler;
-        private readonly ResourcesHandler resourcesHandler;
-
-        public HomeController(ILogger<HomeController> logger,
-            ClientConfig clientConfig,
+        public HomeController(ClientConfig clientConfig,
             TokenHandler tokenHandler,
             ResourcesHandler resourcesHandler)
         {
-            _logger = logger;
-            config = clientConfig;
-            this.tokenHandler = tokenHandler;
-            this.resourcesHandler = resourcesHandler;
+            Config = clientConfig;
+            TokenHandler = tokenHandler;
+            ResourcesHandler = resourcesHandler;
         }
 
         public async Task<IActionResult> IndexAsync()
         {
-            ViewBag.Res1 = await resourcesHandler.GetResourcesAsync(1);
-            ViewBag.Res2 = await resourcesHandler.GetResourcesAsync(2);
-            ViewBag.Res3 = await resourcesHandler.GetResourcesAsync(3);
-            ViewBag.Res4 = await resourcesHandler.GetResourcesAsync(4);
+            ViewBag.Res1 = await ResourcesHandler.GetResourcesAsync(1);
+            ViewBag.Res2 = await ResourcesHandler.GetResourcesAsync(2);
+            ViewBag.Res3 = await ResourcesHandler.GetResourcesAsync(3);
+            ViewBag.Res4 = await ResourcesHandler.GetResourcesAsync(4);
             
-            return View(tokenHandler.HasAccess());
+            return View(TokenHandler.HasAccess());
         }
 
         [Route("ApplyCode/")]
         public IActionResult ApplyAuthCode([FromQuery(Name = "code")] string code)
         {
-            //Here must be request to auth server to get token from code
             return Redirect("~/Home");
         }
 
         public IActionResult Redirection()
         {
-            return Redirect(@$"{config.AuthServerAuthEndpoint}?redirectUrl={config.MyRedirectURL}&clientId={config.ClientId}&responceType=code");
+            return Redirect(@$"{Config.AuthServerAuthEndpoint}?redirectUrl={Config.MyRedirectURL}&clientId={Config.ClientId}&responceType=code");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -55,11 +55,6 @@ namespace OAuthClient
 
             app.UseMiddleware<TokenHandler>();
 
-            //app.Map("/ApplyCode", app =>
-            //    {
-            //        app.UseMiddleware<TokenHandler>();
-            //    });
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
