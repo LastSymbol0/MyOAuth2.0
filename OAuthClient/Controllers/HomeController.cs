@@ -45,7 +45,11 @@ namespace OAuthClient.Controllers
 
         public IActionResult Redirection()
         {
-            return Redirect(@$"{Config.AuthServerAuthEndpoint}?redirectUrl={Config.MyRedirectURL}&clientId={Config.ClientId}&responceType=code");
+            string state = new Random().Next().ToString();
+
+            TokenHandler.State = state;
+
+            return Redirect(@$"{Config.AuthServerAuthEndpoint}?redirectUrl={Config.MyRedirectURL}&clientId={Config.ClientId}&responceType=code&state={state}");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

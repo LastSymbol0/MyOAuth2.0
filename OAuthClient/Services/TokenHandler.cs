@@ -26,10 +26,17 @@ namespace OAuthClient.Services
         {
             if (context.Request.Path.Value.Equals("/ApplyCode"))
             {
-                StringValues code;
-                if (context.Request.Query.TryGetValue("code", out code))
+                if (context.Request.Query.TryGetValue("code", out StringValues code)
+                    && context.Request.Query.TryGetValue("state", out StringValues state))
                 {
-                    await TryToRenewToken(code);
+                    if (state.Equals(State))
+                    {
+                        await TryToRenewToken(code);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid state value recieved");
+                    }
                 }
             }
 
@@ -50,5 +57,6 @@ namespace OAuthClient.Services
 
         public bool HasAccess() => !String.IsNullOrEmpty(Token);
         public string Token { get; set; } = null;
+        public string State { get; set; } = null;
     }
 }

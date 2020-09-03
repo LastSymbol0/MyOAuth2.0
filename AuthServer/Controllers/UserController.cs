@@ -20,13 +20,15 @@ namespace AuthServer.Controllers
         [HttpGet]
         public IActionResult GetAccessToClient([FromQuery(Name = "clientId")] string clientId,
                                                 [FromQuery(Name = "responceType")] string responceType,
-                                                [FromQuery(Name = "redirectUrl")] string redirectUrl)
+                                                [FromQuery(Name = "redirectUrl")] string redirectUrl,
+                                                [FromQuery(Name = "state")] string state)
         {
             RequestCodeClientDTO info = new RequestCodeClientDTO();
 
             info.ClientId = clientId;
             info.ResponceType = responceType;
             info.RedirectUrl = redirectUrl;
+            info.State = state;
 
             return View(new GivingAccessModel{ ClientInfo = info, AccessParameters = new AccessParameters() });
         }
@@ -34,7 +36,7 @@ namespace AuthServer.Controllers
         [HttpPost]
         public IActionResult GetAccessToClient(GivingAccessModel model)
         {
-            return Redirect($"{model.ClientInfo.RedirectUrl}?code={AccessHandler.GenerateAccessCode(model.ClientInfo, model.AccessParameters)}");
+            return Redirect($"{model.ClientInfo.RedirectUrl}?state={model.ClientInfo.State}&code={AccessHandler.GenerateAccessCode(model.ClientInfo, model.AccessParameters)}");
         }
     }
 }
