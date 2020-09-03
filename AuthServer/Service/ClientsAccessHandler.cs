@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuthServer.Service
@@ -60,7 +61,7 @@ namespace AuthServer.Service
 
         public static SymmetricSecurityKey GetSymetricKey() => new SymmetricSecurityKey(Secret);
 
-        public static byte[] Secret = new HMACSHA256().Key;
+        public static byte[] Secret = new HMACSHA256(Encoding.UTF8.GetBytes("MyVerySecretKeyString")).Key;
         public const int TokenLifetime = 10;
         public const string TokenIssuer = "MyAuthServer";
         public const string TokenAudience = "MyAuthClient";
