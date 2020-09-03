@@ -15,22 +15,53 @@ namespace AuthServer.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly ClientsAccessHandler AccessHandler;
-        public ClientController(ClientsAccessHandler accessHandler)
+        private readonly ClientsFirstTimeAccessHandler AccessHandler;
+        private TokenManager TokenManager;
+
+        public ClientController(ClientsFirstTimeAccessHandler accessHandler, TokenManager tokenManager)
         {
             AccessHandler = accessHandler;
+            TokenManager = tokenManager;
         }
 
         [HttpPost("GetToken")]
-        public async Task<ActionResult<string>> GetToken()
+        public async Task<ActionResult<TokenResponceDTO>> GetToken()
         {
             if (Request.Headers.TryGetValue("Content-Type", out StringValues contentType))
             {
-                RequestTokenClientDTO client = new RequestTokenClientDTO();
-
                 if (contentType == "application/x-www-form-urlencoded")
                 {
-                    client.FromForm(Request.Form);
+                    if (Request.Form.TryGetValue("grant_type", out StringValues grantType))
+                    {
+                        if (grantType == "authorization_code")
+                        {
+                            var request = new RequestTokenByCodeClientDTO(Request.Form);
+
+                            TokenResponceDTO token = AccessHandler.GetClientToken(request);
+
+                            if (token == null)
+                            {
+                                return BadRequest("Access for your client was not found\nauthorization_code invalid");
+                            }
+                            return Ok(token);
+                        }
+                        else if (grantType == "refresh_token")
+                        {
+                            var request = new RequestTokenRefreshClientDTO(Request.Form);
+
+                            TokenResponceDTO token = TokenManager.GenerateTokenPair(request.RefreshToken);
+
+                            if (token == null)
+                            {
+                                return BadRequest("Access for your client was not found\refresh_token invalid");
+                            }
+                            return Ok(token);
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException("grant_type value missed.");
+                    }
                 }
                 else if (contentType == "application/json")
                 {
@@ -40,15 +71,6 @@ namespace AuthServer.Controllers
                 {
                     return BadRequest("Uuups...\nUnknown content type");
                 }
-
-                string token = AccessHandler.GetClientToken(client);
-
-                if (String.IsNullOrEmpty(token))
-                {
-                    return BadRequest("Access for your client was not found\n");
-                }
-
-                return Ok(token);
             }
             return BadRequest("Missing Content-Type header");
         }

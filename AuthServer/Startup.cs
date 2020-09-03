@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
 
 namespace AuthServer
 {
@@ -28,7 +29,10 @@ namespace AuthServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ClientsAccessHandler>();
+            services.AddSingleton<ClientsFirstTimeAccessHandler>();
+            services.AddSingleton<TokenManager>();
+
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -38,14 +42,14 @@ namespace AuthServer
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = ClientsAccessHandler.TokenIssuer,
+                        ValidIssuer = TokenManager.TokenIssuer,
 
                         ValidateAudience = true,
-                        ValidAudience = ClientsAccessHandler.TokenAudience,
+                        ValidAudience = TokenManager.TokenAudience,
 
                         ValidateLifetime = true,
 
-                        IssuerSigningKey = ClientsAccessHandler.GetSymetricKey(),
+                        IssuerSigningKey = TokenManager.GetSymetricKey(),
                         ValidateIssuerSigningKey = true,
                     };
                 });

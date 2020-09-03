@@ -53,20 +53,34 @@ namespace OAuthClient.Services
 
             request.RequestUri = new Uri(url);
             request.Method = HttpMethod.Get;
-            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {TokenHandler.Token}");
+            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {TokenHandler.AccessToken}");
 
             try
             {
                 var result = await new HttpClient().SendAsync(request);
 
-                string strResponse = await result.Content.ReadAsStringAsync();
-
-                if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized
+                    || result.StatusCode == System.Net.HttpStatusCode.Forbidden)
                 {
-                    return null;
+                    // Renew token and retry
+                    bool isSucceed = await TokenHandler.TryToRenewToken();
+
+                    if (isSucceed)
+                    {
+                        request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {TokenHandler.AccessToken}");
+                        result = await new HttpClient().SendAsync(request);
+                        if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            return await result.Content.ReadAsStringAsync();
+                        }
+                    }
+                }
+                else if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return await result.Content.ReadAsStringAsync();
                 }
 
-                return strResponse;
+                return null;
             }
             catch (Exception)
             {

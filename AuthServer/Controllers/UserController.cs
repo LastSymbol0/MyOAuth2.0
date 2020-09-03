@@ -11,8 +11,8 @@ namespace AuthServer.Controllers
 {
     public class UserController : Controller
     {
-        private readonly ClientsAccessHandler AccessHandler;
-        public UserController(ClientsAccessHandler accessHandler)
+        private readonly ClientsFirstTimeAccessHandler AccessHandler;
+        public UserController(ClientsFirstTimeAccessHandler accessHandler)
         {
             AccessHandler = accessHandler;
         }

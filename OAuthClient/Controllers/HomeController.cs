@@ -29,12 +29,27 @@ namespace OAuthClient.Controllers
 
         public async Task<IActionResult> IndexAsync()
         {
-            ViewBag.Res1 = await ResourcesHandler.GetResourcesAsync(1);
-            ViewBag.Res2 = await ResourcesHandler.GetResourcesAsync(2);
-            ViewBag.Res3 = await ResourcesHandler.GetResourcesAsync(3);
-            ViewBag.Res4 = await ResourcesHandler.GetResourcesAsync(4);
-            
-            return View(TokenHandler.HasAccess());
+            if (User.HasClaim(claim => claim.Type == "Scope1Access" && claim.Value == "True"))
+            {
+                ViewBag.Res1 = await ResourcesHandler.GetResourcesAsync(1);
+            }
+
+            if (User.HasClaim(claim => claim.Type == "Scope2Access" && claim.Value == "True"))
+            {
+                ViewBag.Res2 = await ResourcesHandler.GetResourcesAsync(2);
+            }
+
+            if (User.HasClaim(claim => claim.Type == "Scope3Access" && claim.Value == "True"))
+            {
+                ViewBag.Res3 = await ResourcesHandler.GetResourcesAsync(3);
+            }
+
+            if (User.HasClaim(claim => claim.Type == "Scope4Access" && claim.Value == "True"))
+            {
+                ViewBag.Res4 = await ResourcesHandler.GetResourcesAsync(4);
+            }
+
+            return View(TokenHandler.HasToken());
         }
 
         [Route("ApplyCode/")]

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +19,15 @@ namespace OAuthClient.Utils
             return Convert.ToBase64String(plainTextBytes);
         }
 
-        public static async Task<string> PostFormUrlEncoded(string url, IEnumerable<KeyValuePair<string, string>> postData, string authValue = null)
+        public static IEnumerable<Claim> GetClaimsFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var DecodedToken = handler.ReadJwtToken(token);
+
+            return DecodedToken.Claims;
+        }
+
+        public static async Task<HttpResponseMessage> PostFormUrlEncoded(string url, IEnumerable<KeyValuePair<string, string>> postData, string authValue = null)
         {
             using (var httpClient = new HttpClient())
             {
@@ -36,9 +46,7 @@ namespace OAuthClient.Utils
                         requestMessage.Headers.TryAddWithoutValidation("Authorization", authValue);
                     }
 
-                    HttpResponseMessage response = await httpClient.SendAsync(requestMessage);
-
-                    return await response.Content.ReadAsStringAsync();
+                    return await httpClient.SendAsync(requestMessage);
                 }
             }
         }

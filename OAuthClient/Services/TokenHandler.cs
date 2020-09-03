@@ -10,6 +10,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using OAuthClient.Utils;
+using OAuthClient.Models;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace OAuthClient.Services
 {
@@ -31,7 +34,7 @@ namespace OAuthClient.Services
                 {
                     if (state.Equals(State))
                     {
-                        await TryToRenewToken(code);
+                        await RequestToken(code);
                     }
                     else
                     {
@@ -40,10 +43,58 @@ namespace OAuthClient.Services
                 }
             }
 
+            // if page with protected resources
+            if (context.Request.Path.Value.Equals("/Home"))
+            {
+                // if expired
+                if (DateTime.Compare(AccessTokenExpirationDate, DateTime.UtcNow) < 0)
+                {
+                   bool isSucceed = await TryToRenewToken();
+
+                   if (!isSucceed)
+                   {
+                        
+                        // Redirect to auth with client page
+                   }
+                }
+            }
+
+            var identy = new ClaimsIdentity(TokenClaims);
+            context.User.AddIdentity(identy);
+
             await next(context);
         }
 
-        private async Task TryToRenewToken(string code)
+        public async Task<bool> TryToRenewToken()
+        {
+            if (String.IsNullOrEmpty(RefreshToken))
+            {
+                return false;
+            }
+
+            AccessToken = null;
+
+            List<KeyValuePair<string, string>> data = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                new KeyValuePair<string, string>("refresh_token", RefreshToken)
+            };
+
+            var response = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
+
+            string strResponce = await response.Content.ReadAsStringAsync();
+
+            TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
+            AccessToken = token.AccessToken;
+            RefreshToken = token.RefreshToken;
+            AccessTokenExpirationDate = token.AccessTokenExpirationDate;
+
+            TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
+
+            return true;
+        }
+
+        private async Task RequestToken(string code)
         {
             List<KeyValuePair<string, string>> data = new List<KeyValuePair<string, string>>
             {
@@ -52,11 +103,25 @@ namespace OAuthClient.Services
                 new KeyValuePair<string, string>("redirect_uri", Сonfig.MyRedirectURL),
             };
 
-            Token = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
+            var response = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
+
+            string strResponce = await response.Content.ReadAsStringAsync();
+
+            TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
+            AccessToken = token.AccessToken;
+            RefreshToken = token.RefreshToken;
+            AccessTokenExpirationDate = token.AccessTokenExpirationDate;
+
+            TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
         }
 
-        public bool HasAccess() => !String.IsNullOrEmpty(Token);
-        public string Token { get; set; } = null;
+        public bool HasToken() => !String.IsNullOrEmpty(AccessToken) && DateTime.Compare(AccessTokenExpirationDate, DateTime.UtcNow) < 0;
+
+        public string AccessToken { get; set; } = null;
+        private string RefreshToken { get; set; } = null;
+        private DateTime AccessTokenExpirationDate { get; set; }
+        public IEnumerable<Claim> TokenClaims { get; set; } = null;
+
         public string State { get; set; } = null;
     }
 }
