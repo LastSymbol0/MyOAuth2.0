@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AuthServer.Models;
 using AuthServer.Service;
+using AuthServer.Validation;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,63 +19,65 @@ namespace AuthServer.Controllers
     {
         private readonly ClientsFirstTimeAccessHandler AccessHandler;
         private TokenManager TokenManager;
+        private IMapper Mapper;
 
-        public ClientController(ClientsFirstTimeAccessHandler accessHandler, TokenManager tokenManager)
+        public ClientController(
+            ClientsFirstTimeAccessHandler accessHandler,
+            TokenManager tokenManager,
+            IMapper mapper)
         {
             AccessHandler = accessHandler;
             TokenManager = tokenManager;
+            Mapper = mapper;
         }
 
         [HttpPost("GetToken")]
+        [RequiredHeadersAttribure("Content-Type")]
         public async Task<ActionResult<TokenResponceDTO>> GetToken()
         {
-            if (Request.Headers.TryGetValue("Content-Type", out StringValues contentType))
+            Request.Headers.TryGetValue("Content-Type", out StringValues contentType);
+
+            if (contentType == "application/x-www-form-urlencoded")
             {
-                if (contentType == "application/x-www-form-urlencoded")
+                if (Request.Form.TryGetValue("grant_type", out StringValues grantType))
                 {
-                    if (Request.Form.TryGetValue("grant_type", out StringValues grantType))
+                    if (grantType == "authorization_code")
                     {
-                        if (grantType == "authorization_code")
+                        var request = Mapper.Map<RequestTokenByCodeClientDTO>(Request.Form);
+
+                        TokenResponceDTO token = AccessHandler.GetClientToken(request);
+
+                        if (token == null)
                         {
-                            var request = new RequestTokenByCodeClientDTO(Request.Form);
-
-                            TokenResponceDTO token = AccessHandler.GetClientToken(request);
-
-                            if (token == null)
-                            {
-                                return BadRequest("Access for your client was not found\nauthorization_code invalid");
-                            }
-                            return Ok(token);
+                            return BadRequest("Access for your client was not found\nauthorization_code invalid");
                         }
-                        else if (grantType == "refresh_token")
-                        {
-                            var request = new RequestTokenRefreshClientDTO(Request.Form);
-
-                            TokenResponceDTO token = TokenManager.GenerateTokenPair(request.RefreshToken);
-
-                            if (token == null)
-                            {
-                                return BadRequest("Access for your client was not found\refresh_token invalid");
-                            }
-                            return Ok(token);
-                        }
+                        return Ok(token);
                     }
-                    else
+                    else if (grantType == "refresh_token")
                     {
-                        throw new ArgumentNullException("grant_type value missed.");
+                        var request = Mapper.Map<RequestTokenRefreshClientDTO>(Request.Form);
+
+                        TokenResponceDTO token = TokenManager.GenerateTokenPair(request.RefreshToken);
+
+                        if (token == null)
+                        {
+                            return BadRequest("Access for your client was not found\refresh_token invalid");
+                        }
+                        return Ok(token);
                     }
-                }
-                else if (contentType == "application/json")
-                {
-                    return BadRequest("Uuups...\nUnsupported content type");
                 }
                 else
                 {
-                    return BadRequest("Uuups...\nUnknown content type");
+                    throw new ArgumentNullException("grant_type value missed.");
                 }
             }
-            return BadRequest("Missing Content-Type header");
+            else if (contentType == "application/json")
+            {
+                return BadRequest("Uuups...\nUnsupported content type");
+            }
+            return BadRequest("Uuups...\nUnknown content type");
         }
+
 
         [Authorize]
         [HttpGet("Auth")]

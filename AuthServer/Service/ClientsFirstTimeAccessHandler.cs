@@ -25,9 +25,12 @@ namespace AuthServer.Service
 
         private TokenManager TokenManager;
 
-        public ClientsFirstTimeAccessHandler(TokenManager tokenManager)
+        private IMapper Mapper;
+
+        public ClientsFirstTimeAccessHandler(TokenManager tokenManager, IMapper mapper)
         {
             TokenManager = tokenManager;
+            Mapper = mapper;
         }
 
         public string GenerateAccessCode(RequestCodeClientDTO info, AccessParameters accessParam)
@@ -46,7 +49,7 @@ namespace AuthServer.Service
             {
                 ClientsToAuth.Remove(clientDTO.Code);
 
-                var claims = client.accessParam.GetClaims();
+                var claims = Mapper.Map<IEnumerable<Claim>>(client.accessParam);
 
                 return TokenManager.GenerateTokenPair(claims);
             }
