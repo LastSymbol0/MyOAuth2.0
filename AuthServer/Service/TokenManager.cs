@@ -14,13 +14,6 @@ namespace AuthServer.Service
 {
     public class TokenManager
     {
-        private IMapper Mapper;
-
-        public TokenManager(IMapper mapper)
-        {
-            Mapper = mapper;
-        }
-
         public AccessTokenDTO GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var tokenDTO = new AccessTokenDTO();
@@ -41,15 +34,11 @@ namespace AuthServer.Service
             return tokenDTO;
         }
 
-        private string GenerateRefreshToken(string sessionId) => sessionId + Utils.Utils.GenerateRandomString(32);
-
         public static SymmetricSecurityKey GetSymetricKey() => new SymmetricSecurityKey(Secret);
 
         public static byte[] Secret = new HMACSHA256(Encoding.UTF8.GetBytes("MyVerySecretKeyString")).Key;
         public const int TokenLifetime = 1;
         public const string TokenIssuer = "MyAuthServer";
         public const string TokenAudience = "MyAuthClient";
-
-        //private IDictionary<string, IEnumerable<Claim>> refreshTokens = new Dictionary<string, IEnumerable<Claim>>();
     }
 }

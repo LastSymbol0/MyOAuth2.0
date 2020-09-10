@@ -28,16 +28,6 @@ namespace AuthServer.Infrastructure.Repository
         {
             SessionsContext.Sessions.Add(session);
 
-            //if (!SessionsContext.Clients.Any(client => client.Id == session.ClientId))
-            //{
-            //    SessionsContext.Clients.Add(new Client(session.ClientId, "dummy"));
-            //}
-
-            //if (!SessionsContext.ResourceOwners.Any(ro => ro.Id == session.ResourceOwnerId))
-            //{
-            //    SessionsContext.ResourceOwners.Add(new ResourceOwner(session.ResourceOwnerId));
-            //}
-
             await SessionsContext.SaveChangesAsync();
 
             return true;

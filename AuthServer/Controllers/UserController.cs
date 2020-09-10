@@ -51,15 +51,7 @@ namespace AuthServer.Controllers
         [HttpPost]
         public async Task<IActionResult> GetAccessToClientAsync(GivingAccessModel model)
         {
-            //SessionCommandResponce commandResponce = await Mediator.Execute<StartSessionCommand, SessionCommandResponce>(new StartSessionCommand
-            //{
-            //    ClientId = model.ClientInfo.ClientId,
-            //    ResourceOwnerId = model.ClientInfo.ResouceOwnerId,
-            //    ClientSecret = "",
-            //    AccessParameters = Mapper.Map<AccessParameters>(model.AccessParameters)
-            //});
-
-            SessionCommandResponce commandResponce = await Mediator.Exe(new StartSessionCommand
+            SessionCommandResponce commandResponce = await Mediator.Execute<StartSessionCommand, SessionCommandResponce>(new StartSessionCommand
             {
                 ClientId = model.ClientInfo.ClientId,
                 ResourceOwnerId = model.ClientInfo.ResouceOwnerId,

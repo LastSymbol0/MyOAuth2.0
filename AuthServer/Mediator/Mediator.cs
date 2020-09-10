@@ -15,17 +15,6 @@ namespace AuthServer.Mediator
             this.ServiceProvider = serviceProvider;
         }
 
-        public async Task<TResponce> Exe<TResponce>(ICommand<TResponce> command)
-        {
-            var comT = command.GetType();
-
-            var handlerType = typeof(ICommandHandler<,>).MakeGenericType(comT, typeof(TResponce));
-
-            dynamic handler = ServiceProvider.GetService(handlerType);
-
-            return await handler.Handle(command);
-        }
-
         public async Task<TResponce> Execute<TCommand, TResponce>(TCommand command)
             where TCommand : ICommand<TResponce>
         {
