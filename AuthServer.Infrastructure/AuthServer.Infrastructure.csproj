@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200908152027_Init.cs" />
+    <Compile Remove="Migrations\20200908152027_Init.Designer.cs" />
+    <Compile Remove="Migrations\20200909080152_AccessParamtersChange1.cs" />
+    <Compile Remove="Migrations\20200909080152_AccessParamtersChange1.Designer.cs" />
+    <Compile Remove="Migrations\20200909081656_AccessParametersFix.cs" />
+    <Compile Remove="Migrations\20200909081656_AccessParametersFix.Designer.cs" />
+    <Compile Remove="Migrations\20200909083933_IdNoGenerated.cs" />
+    <Compile Remove="Migrations\20200909083933_IdNoGenerated.Designer.cs" />
+    <Compile Remove="Migrations\20200909090949_NewInit.cs" />
+    <Compile Remove="Migrations\20200909090949_NewInit.Designer.cs" />
+    <Compile Remove="Migrations\20200909091317_Init.cs" />
+    <Compile Remove="Migrations\20200909091317_Init.Designer.cs" />
+    <Compile Remove="Migrations\20200909091725_AddedDBSetExplicit.cs" />
+    <Compile Remove="Migrations\20200909091725_AddedDBSetExplicit.Designer.cs" />
+    <Compile Remove="Migrations\20200909092224_InitFi.cs" />
+    <Compile Remove="Migrations\20200909092224_InitFi.Designer.cs" />
+    <Compile Remove="Migrations\20200909093727_UpdIds.cs" />
+    <Compile Remove="Migrations\20200909093727_UpdIds.Designer.cs" />
+    <Compile Remove="Migrations\20200910092741_RenewedClienAndROTables.cs" />
+    <Compile Remove="Migrations\20200910092741_RenewedClienAndROTables.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuthServer.Domain\AuthServer.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

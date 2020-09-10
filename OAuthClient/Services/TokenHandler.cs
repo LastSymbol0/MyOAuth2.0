@@ -13,6 +13,7 @@ using OAuthClient.Utils;
 using OAuthClient.Models;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading;
 
 namespace OAuthClient.Services
 {
@@ -82,16 +83,24 @@ namespace OAuthClient.Services
 
             var response = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
 
-            string strResponce = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                string strResponce = await response.Content.ReadAsStringAsync();
 
-            TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
-            AccessToken = token.AccessToken;
-            RefreshToken = token.RefreshToken;
-            AccessTokenExpirationDate = token.AccessTokenExpirationDate;
+                TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
+                AccessToken = token.AccessToken;
+                RefreshToken = token.RefreshToken;
+                AccessTokenExpirationDate = token.AccessTokenExpirationDate;
 
-            TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
+                TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
 
-            return true;
+                return true;
+            }
+            else
+            {
+                // Unable to refresh token
+                return false;
+            }
         }
 
         private async Task RequestToken(string code)
@@ -105,14 +114,21 @@ namespace OAuthClient.Services
 
             var response = await HttpUtils.PostFormUrlEncoded(Сonfig.AuthServerTokenEndpoint, data, $"Basic {HttpUtils.GetBase64Creds(Сonfig.ClientId, Сonfig.ClientSecret)}");
 
-            string strResponce = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                string strResponce = await response.Content.ReadAsStringAsync();
 
-            TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
-            AccessToken = token.AccessToken;
-            RefreshToken = token.RefreshToken;
-            AccessTokenExpirationDate = token.AccessTokenExpirationDate;
+                TokenDTO token = Newtonsoft.Json.JsonConvert.DeserializeObject<TokenDTO>(strResponce);
+                AccessToken = token.AccessToken;
+                RefreshToken = token.RefreshToken;
+                AccessTokenExpirationDate = token.AccessTokenExpirationDate;
 
-            TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
+                TokenClaims = HttpUtils.GetClaimsFromToken(AccessToken);
+            }
+            else
+            {
+                // Unable to refresh token
+            }
         }
 
         public bool HasToken() => !String.IsNullOrEmpty(AccessToken) && DateTime.Compare(AccessTokenExpirationDate, DateTime.UtcNow) < 0;

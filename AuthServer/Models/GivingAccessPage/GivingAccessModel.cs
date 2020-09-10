@@ -7,7 +7,7 @@ namespace AuthServer.Models.GivingAccessPage
 {
     public class GivingAccessModel
     {
-        public AccessParameters  AccessParameters { get; set;}
+        public AccessParametersDTO  AccessParameters { get; set;}
         public RequestCodeClientDTO  ClientInfo {get; set;}
     }
 }

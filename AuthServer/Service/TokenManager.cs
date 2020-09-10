@@ -1,4 +1,5 @@
 ﻿using AuthServer.Models;
+using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,69 +14,34 @@ namespace AuthServer.Service
 {
     public class TokenManager
     {
-        public TokenResponceDTO GenerateTokenPair(IEnumerable<Claim> claims)
-        {
-            var tokenDTO = new TokenResponceDTO();
+        private IMapper Mapper;
 
-            tokenDTO.AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(TokenLifetime);
+        public TokenManager(IMapper mapper)
+        {
+            Mapper = mapper;
+        }
+
+        public AccessTokenDTO GenerateAccessToken(IEnumerable<Claim> claims)
+        {
+            var tokenDTO = new AccessTokenDTO();
+
+            tokenDTO.ExpirationDate = DateTime.UtcNow.AddMinutes(TokenLifetime);
 
             JwtSecurityToken token = new JwtSecurityToken(
                     issuer: TokenIssuer,
                     audience: TokenAudience,
                     notBefore: DateTime.UtcNow,
                     claims: claims,
-                    expires: tokenDTO.AccessTokenExpirationDate,
+                    expires: tokenDTO.ExpirationDate,
                     signingCredentials: new SigningCredentials(GetSymetricKey(), SecurityAlgorithms.HmacSha256)
                 );
 
             tokenDTO.AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            tokenDTO.RefreshToken = GenerateRefreshToken(claims);
-
             return tokenDTO;
         }
 
-        public TokenResponceDTO GenerateTokenPair(string refreshToken)
-        {
-            if (refreshTokens.TryGetValue(refreshToken, out IEnumerable<Claim> claims))
-            {
-                refreshTokens.Remove(refreshToken);
-
-                var tokenDTO = new TokenResponceDTO();
-
-                tokenDTO.AccessTokenExpirationDate = DateTime.UtcNow.AddMinutes(TokenLifetime);
-
-                JwtSecurityToken token = new JwtSecurityToken(
-                        issuer: TokenIssuer,
-                        audience: TokenAudience,
-                        notBefore: DateTime.UtcNow,
-                        claims: claims,
-                        expires: tokenDTO.AccessTokenExpirationDate,
-                        signingCredentials: new SigningCredentials(GetSymetricKey(), SecurityAlgorithms.HmacSha256)
-                    );
-
-                tokenDTO.AccessToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-                tokenDTO.RefreshToken = GenerateRefreshToken(claims);
-
-                return tokenDTO;
-            }
-            return null;
-        }
-
-        private string GenerateRefreshToken(IEnumerable<Claim> claims)
-        {
-            var randomNumber = new byte[32];
-            using (var r = RandomNumberGenerator.Create())
-            {
-                r.GetBytes(randomNumber);
-                string refreshToken = Convert.ToBase64String(randomNumber);
-
-                refreshTokens.Add(refreshToken, claims);
-
-                return refreshToken;
-            }
-        }
+        private string GenerateRefreshToken(string sessionId) => sessionId + Utils.Utils.GenerateRandomString(32);
 
         public static SymmetricSecurityKey GetSymetricKey() => new SymmetricSecurityKey(Secret);
 
@@ -84,6 +50,6 @@ namespace AuthServer.Service
         public const string TokenIssuer = "MyAuthServer";
         public const string TokenAudience = "MyAuthClient";
 
-        private IDictionary<string, IEnumerable<Claim>> refreshTokens = new Dictionary<string, IEnumerable<Claim>>();
+        //private IDictionary<string, IEnumerable<Claim>> refreshTokens = new Dictionary<string, IEnumerable<Claim>>();
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuthServer.Models
 {
-    public class AccessParameters
+    public class AccessParametersDTO
     {
         public bool Scope1Access { get; set; } = false;
         public bool Scope2Access { get; set; } = false;

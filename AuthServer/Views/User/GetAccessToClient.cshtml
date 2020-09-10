@@ -28,45 +28,47 @@
         </div>*@
 
 
-        <div class="d-flex justify-content-around">
-            @using (Html.BeginForm())
+    <div class="d-flex justify-content-around">
+        @using (Html.BeginForm())
             {
-                @Html.HiddenFor(m => m.ClientInfo.ClientId)
-                @Html.HiddenFor(m => m.ClientInfo.RedirectUrl)
-                @Html.HiddenFor(m => m.ClientInfo.ResponceType)
-                @Html.HiddenFor(m => m.ClientInfo.State)
-                <table>
-                    <tr>
-                        <td><p>Access level 1 </p></td>
-                        <td>
-                            @Html.CheckBoxFor(m => m.AccessParameters.Scope1Access)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><p>Access level 2 </p></td>
-                        <td>
-                            @Html.CheckBoxFor(m => m.AccessParameters.Scope2Access)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><p> Access level 3 </p></td>
-                        <td>
-                            @Html.CheckBoxFor(m => m.AccessParameters.Scope3Access)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><p> Access level 4 </p></td>
-                        <td>
-                            @Html.CheckBoxFor(m => m.AccessParameters.Scope4Access)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input class="btn btn-success" type="submit" value="Allow" /> </td>
+        @Html.HiddenFor(m => m.ClientInfo.ClientId)
+        @Html.HiddenFor(m => m.ClientInfo.ResouceOwnerId)
+        @Html.HiddenFor(m => m.ClientInfo.RedirectUrl)
+        @Html.HiddenFor(m => m.ClientInfo.ResponceType)
+        @Html.HiddenFor(m => m.ClientInfo.State)
+        @Html.HiddenFor(m => m.AccessParameters)
+        <table>
+            <tr>
+                <td><p>Access level 1 </p></td>
+                <td>
+                    @Html.CheckBoxFor(m => m.AccessParameters.Scope1Access)
+                </td>
+            </tr>
+            <tr>
+                <td><p>Access level 2 </p></td>
+                <td>
+                    @Html.CheckBoxFor(m => m.AccessParameters.Scope2Access)
+                </td>
+            </tr>
+            <tr>
+                <td><p> Access level 3 </p></td>
+                <td>
+                    @Html.CheckBoxFor(m => m.AccessParameters.Scope3Access)
+                </td>
+            </tr>
+            <tr>
+                <td><p> Access level 4 </p></td>
+                <td>
+                    @Html.CheckBoxFor(m => m.AccessParameters.Scope4Access)
+                </td>
+            </tr>
+            <tr>
+                <td><input class="btn btn-success" type="submit" value="Allow" /> </td>
 
-                        <td><a class="btn btn-danger" href="@Model.ClientInfo.RedirectUrl">Deny</a> </td>
-                    </tr>
-                </table>
+                <td><a class="btn btn-danger" href="@Model.ClientInfo.RedirectUrl">Deny</a> </td>
+            </tr>
+        </table>
             }
-        </div>
+    </div>
 
     </div>

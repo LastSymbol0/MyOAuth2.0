@@ -7,7 +7,8 @@ namespace AuthServer.Models
 {
     public class RequestCodeClientDTO
     {
-        public string ClientId { get; set;}
+        public string ResouceOwnerId { get; set;}
+        public string ClientId { get; set; }
         public string ResponceType { get; set;}
         public string RedirectUrl { get; set;}
         public string State { get; set; }

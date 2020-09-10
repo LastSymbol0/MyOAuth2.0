@@ -12,6 +12,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using AutoMapper;
+using AuthServer.Mediator;
+using AuthServer.Mediator.Commands;
+using AuthServer.Mediator.Queries;
+using AuthServer.Domain.AggregatesModel.SessionAggregate;
+
+using AuthServer.Infrastructure.Repository;
+//using Pomelo.EntityFrameworkCore.MySql;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthServer
 {
@@ -27,10 +35,25 @@ namespace AuthServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ClientsFirstTimeAccessHandler>();
+            //services.AddSingleton<ClientsFirstTimeAccessHandler>();
             services.AddSingleton<TokenManager>();
 
+            //services.AddSingleton<IInitSessionsDAL, InitSessionsDAL>();
+            //services.AddSingleton<IAuthorizedSessionsDAL, AuthorizedSessionsDAL>();
+
             services.AddAutoMapper(typeof(Startup));
+
+            string dbConnection = Configuration.GetConnectionString("SessionsDB");
+
+            services.AddDbContext<SessionsContext>(opt => opt.UseMySql(dbConnection));
+            services.AddScoped<ISessionRepository,SessionRepository>();
+
+            services.AddMediator()
+                .AddCommand<StartSessionCommand, StartSessionCommandHandler, SessionCommandResponce>()
+                .AddCommand<AuthenticateClientCommand, AuthenticateClientCommandHandler, SessionCommandResponce>()
+                .AddCommand<RefreshClientTokenCommand, RefreshClientTokenCommandHandler, SessionCommandResponce>()
+                .AddQuery<GetTokenPairQuery, GetTokenPairQueryHandler, GetTokenPairQueryDTO>()
+                .AddQuery<GetClientAuthCodeQuery, GetClientAuthCodeQueryHandler, string>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

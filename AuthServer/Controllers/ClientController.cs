@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthServer.Mediator;
+using AuthServer.Mediator.Commands;
+using AuthServer.Mediator.Queries;
 using AuthServer.Models;
 using AuthServer.Service;
 using AuthServer.Validation;
@@ -17,65 +20,65 @@ namespace AuthServer.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly ClientsFirstTimeAccessHandler AccessHandler;
-        private TokenManager TokenManager;
-        private IMapper Mapper;
+        private IMediator Mediator;
 
-        public ClientController(
-            ClientsFirstTimeAccessHandler accessHandler,
-            TokenManager tokenManager,
-            IMapper mapper)
+        public ClientController(IMediator mediator)
         {
-            AccessHandler = accessHandler;
-            TokenManager = tokenManager;
-            Mapper = mapper;
+            Mediator = mediator;
         }
+
 
         [HttpPost("GetToken")]
         [RequiredHeadersAttribure("Content-Type")]
-        public async Task<ActionResult<TokenResponceDTO>> GetToken()
+        public async Task<ActionResult<GetTokenPairQueryDTO>> GetToken(
+                                [FromForm(Name = "grant_type")] String grantType,
+                                [FromForm(Name = "refresh_token")] String refreshToken,
+                                [FromForm(Name = "redirect_url")] String redirectUrl,
+                                [FromForm(Name = "code")] String code,
+                                [FromHeader(Name = "Authorization")] string authHeader)
         {
-            Request.Headers.TryGetValue("Content-Type", out StringValues contentType);
+            // Tmp client auth
+            // TODO: Client's authorization header value must be parsed in auth middleware
+            //       and accessed here via something like User.Id
+            var (clientId, clientSecret) = Utils.Utils.GetLoginPasswordFromAuthHeader(authHeader);
 
-            if (contentType == "application/x-www-form-urlencoded")
+            SessionCommandResponce commandResponce;
+
+            if (grantType == "authorization_code")
             {
-                if (Request.Form.TryGetValue("grant_type", out StringValues grantType))
+                commandResponce = await Mediator.Execute<AuthenticateClientCommand, SessionCommandResponce>(new AuthenticateClientCommand
                 {
-                    if (grantType == "authorization_code")
-                    {
-                        var request = Mapper.Map<RequestTokenByCodeClientDTO>(Request.Form);
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
+                    AuthenticationCode = code
+                });
 
-                        TokenResponceDTO token = AccessHandler.GetClientToken(request);
-
-                        if (token == null)
-                        {
-                            return BadRequest("Access for your client was not found\nauthorization_code invalid");
-                        }
-                        return Ok(token);
-                    }
-                    else if (grantType == "refresh_token")
-                    {
-                        var request = Mapper.Map<RequestTokenRefreshClientDTO>(Request.Form);
-
-                        TokenResponceDTO token = TokenManager.GenerateTokenPair(request.RefreshToken);
-
-                        if (token == null)
-                        {
-                            return BadRequest("Access for your client was not found\refresh_token invalid");
-                        }
-                        return Ok(token);
-                    }
-                }
-                else
-                {
-                    throw new ArgumentNullException("grant_type value missed.");
-                }
             }
-            else if (contentType == "application/json")
+            else if (grantType == "refresh_token")
             {
-                return BadRequest("Uuups...\nUnsupported content type");
+                commandResponce = await Mediator.Execute<RefreshClientTokenCommand, SessionCommandResponce>(new RefreshClientTokenCommand
+                {
+                    ClientId = clientId,
+                    ClientSecret = clientSecret,
+                    RefreshToken = refreshToken
+                });
             }
-            return BadRequest("Uuups...\nUnknown content type");
+            else
+            {
+                return BadRequest("Invalid Grant Type");
+            }
+
+            if (!commandResponce.IsSucceed)
+            {
+                return BadRequest("Access for your client was not found\nGrant may be invalid");
+            }
+
+            var resp = await Mediator.Get<GetTokenPairQuery, GetTokenPairQueryDTO>(new GetTokenPairQuery
+            {
+                SessionId = commandResponce.SessionId ?? 0 // here commandResponce.SessionId will never be null
+            });
+
+            return Ok(resp);
         }
 
 
