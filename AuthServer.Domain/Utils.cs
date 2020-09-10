@@ -19,5 +19,7 @@ namespace AuthServer.Domain
                 return randomString;
             }
         }
+
+        public static int GenerateRandomInt() => RandomNumberGenerator.GetInt32(int.MaxValue);
     }
 }

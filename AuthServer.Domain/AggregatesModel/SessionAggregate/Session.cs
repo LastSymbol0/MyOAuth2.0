@@ -125,7 +125,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
             return code == ClientGrantValue;
         }
 
-        private string GenerateRefreshToken() => Utils.GenerateRandomString(32);
-        private string GenerateAuthCode() => Utils.GenerateRandomString(32);
+        private string GenerateRefreshToken() => Utils.GenerateRandomString(32).Replace(' ', '0');
+        private string GenerateAuthCode() => Utils.GenerateRandomInt().ToString();
     }
 }
