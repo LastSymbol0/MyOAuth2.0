@@ -35,9 +35,6 @@ namespace AuthServer.Infrastructure.Repository
 
         public Session GetSessionById(int id)
         {
-            return SessionsContext.Sessions
-                .Where(i => i.Id == id)
-                .FirstOrDefault();
             return SessionsContext.Find<Session>(id);
         }
 
