@@ -18,7 +18,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
         public DateTime ExpireIn
         {
             get => ClientGrantType == GrantType.refresh_token ? DateTime.MaxValue : _ExpireIn;
-            private set => _ExpireIn = value;
+            set => _ExpireIn = value;
         }
         private DateTime _ExpireIn;
 
@@ -31,7 +31,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
                        int resourceOwnerId,
                        AccessParameters accessParameters)
         {
-            const double AUTH_CODE_EXPIRATION_TIME = 600;
+            const double AUTH_CODE_EXPIRATION_TIME = 30;
 
             ClientId = clientId;
             ResourceOwnerId = resourceOwnerId;
@@ -101,7 +101,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
             return false;
         }
 
-        public bool ValidateRefreshToken(string token)
+        private bool ValidateRefreshToken(string token)
         {
             if (ClientGrantType != GrantType.refresh_token
                 || String.IsNullOrEmpty(token)
@@ -113,7 +113,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
             return token == ClientGrantValue;
         }
 
-        public bool ValidateAuthCode(string code)
+        private bool ValidateAuthCode(string code)
         {
             if (ClientGrantType != GrantType.code
                 || String.IsNullOrEmpty(code)
