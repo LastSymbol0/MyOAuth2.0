@@ -8,7 +8,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
     public class Session : Entity, IAggregateRoot
     {
         public SessionStatus Status { get; private set; }
-        public int ClientId { get; private set; }
+        public virtual int ClientId { get; private set; }
         public int ResourceOwnerId { get; private set; }
         public AccessParameters AccessParameters { get; private set; }
 
@@ -45,10 +45,10 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
             ExpireIn = DateTime.UtcNow.AddSeconds(AUTH_CODE_EXPIRATION_TIME);
         }
 
-        public bool IsValid() => DateTime.Compare(ExpireIn, DateTime.UtcNow) > 0 && Status != SessionStatus.None && Status != SessionStatus.Closed;
-        public bool IsOpen() => Status == SessionStatus.Open;
+        public virtual bool IsValid() => DateTime.Compare(ExpireIn, DateTime.UtcNow) > 0 && Status != SessionStatus.None && Status != SessionStatus.Closed;
+        public virtual bool IsOpen() => Status == SessionStatus.Open;
 
-        public bool OpenSession(string code)
+        public virtual bool OpenSession(string code)
         {
             if (Status != SessionStatus.WaitingForClientAuthorization
                 || DateTime.Compare(ExpireIn, DateTime.UtcNow) < 0
@@ -77,7 +77,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
             return true;
         }
 
-        public bool RefreshToken(string token)
+        public virtual bool RefreshToken(string token)
         {
             if (!ValidateRefreshToken(token))
             {
