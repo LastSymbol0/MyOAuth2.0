@@ -20,6 +20,8 @@ namespace AuthServer.Mediator
         {
             var handler = ServiceProvider.GetService<ICommandHandler<TCommand, TResponce>>();
 
+            // TODO: here needs to be added command validation (like ICommandValidator<T>.Validate())
+
             return await handler.Handle(command);
         }
 
@@ -27,6 +29,8 @@ namespace AuthServer.Mediator
             where TQuery : IQuery<TResponce>
         {
             var handler = ServiceProvider.GetService<IQueryHandler<TQuery, TResponce>>();
+
+            // TODO: here needs to be added query validation (like IQueryValidator<T>.Validate())
 
             return await handler.Handle(query);
         }
