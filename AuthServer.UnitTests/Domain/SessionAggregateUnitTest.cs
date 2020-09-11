@@ -44,6 +44,7 @@ namespace AuthServer.UnitTests.Domain
             Assert.True(DateTime.Compare(session.ExpireIn, DateTime.UtcNow) > 0);
 
             Assert.True(session.IsValid());
+            Assert.True(int.TryParse(session.ClientGrantValue, out int n));
             Assert.False(session.IsOpen());
         }
 
@@ -68,6 +69,8 @@ namespace AuthServer.UnitTests.Domain
             Assert.True(isSucceed);
             Assert.True(ValidStartedSession.IsValid());
             Assert.True(ValidStartedSession.IsOpen());
+            Assert.True(ValidStartedSession.ClientGrantValue.Length == 32);
+            Assert.False(ValidStartedSession.ClientGrantValue.Contains(' '));
             Assert.Equal(GrantType.refresh_token, ValidStartedSession.ClientGrantType);
         }
 
