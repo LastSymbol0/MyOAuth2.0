@@ -12,12 +12,12 @@ namespace AuthServer.Mediator.Queries
     public class GetTokenPairQueryHandler : IQueryHandler<GetTokenPairQuery, GetTokenPairQueryDTO>
     {
         ISessionRepository SessionRepository;
-        TokenManager TokenManager;
+        ITokenManager TokenManager;
         private IMapper Mapper;
 
         public GetTokenPairQueryHandler(
             ISessionRepository sessionRepository,
-            TokenManager tokenManager,
+            ITokenManager tokenManager,
             IMapper mapper)
         {
             SessionRepository = sessionRepository;

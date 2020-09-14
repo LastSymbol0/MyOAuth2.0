@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AuthServer.Service
 {
-    public class TokenManager
+    public class TokenManager : ITokenManager
     {
         public AccessTokenDTO GenerateAccessToken(IEnumerable<Claim> claims)
         {
