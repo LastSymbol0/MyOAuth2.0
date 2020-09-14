@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.AggregatesModel.SessionAggregate
 {
@@ -19,6 +20,15 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
         public override string ToString() => $"{ScopeName}:{HasAccess}";
         public void FromString(string s)
         {
+            if (s == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if (!Regex.IsMatch(s, "^.*:(true|True|false|False)$"))
+            {
+                throw new FormatException();
+            }
+
             int separatorIndex = s.IndexOf(':');
 
             ScopeName = s.Substring(0, separatorIndex);
@@ -29,10 +39,6 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
     [Owned]
     public class AccessParameters : IValueObject
     {
-        /// <summary>
-        /// Key - scope name
-        /// Value - has access
-        /// </summary>
         public IList<ScopeAccess> Scopes { get; private set; } = new List<ScopeAccess>();
 
         public AccessParameters() { }
@@ -55,7 +61,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
 
         public bool HasAccess(string scope)
         {
-            return Scopes.Where(i => i.ScopeName == scope)?.FirstOrDefault()?.HasAccess ?? false;
+            return Scopes.FirstOrDefault(i => i.ScopeName == scope)?.HasAccess ?? false;
         }
     }
 }

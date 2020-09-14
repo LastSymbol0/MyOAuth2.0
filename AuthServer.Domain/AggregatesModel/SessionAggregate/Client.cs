@@ -13,7 +13,7 @@ namespace AuthServer.Domain.AggregatesModel.SessionAggregate
         public Client(int clientId, string clientSecret)
         {
             Id = clientId;
-            ClientSecret = clientSecret;
+            ClientSecret = clientSecret ?? throw new ArgumentNullException();
         }
     }
 }
