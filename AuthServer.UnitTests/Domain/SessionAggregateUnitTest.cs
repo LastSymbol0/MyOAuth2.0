@@ -69,9 +69,22 @@ namespace AuthServer.UnitTests.Domain
             Assert.True(isSucceed);
             Assert.True(ValidStartedSession.IsValid());
             Assert.True(ValidStartedSession.IsOpen());
-            Assert.True(ValidStartedSession.ClientGrantValue.Length == 32);
             Assert.False(ValidStartedSession.ClientGrantValue.Contains(' '));
             Assert.Equal(GrantType.refresh_token, ValidStartedSession.ClientGrantType);
+        }
+
+        [Fact]
+        public void TestSession_Open_Failure_InvalidStatus()
+        {
+            // precondition [
+            bool isSucceed = ValidStartedSession.OpenSession(ValidStartedSession.ClientGrantValue);
+            Assert.True(isSucceed);
+            // ]
+
+            var code = ValidStartedSession.ClientGrantValue;
+            isSucceed = ValidStartedSession.OpenSession(code);
+
+            Assert.False(isSucceed);
         }
 
         [Fact]
