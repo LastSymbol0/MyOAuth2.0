@@ -5,6 +5,7 @@
     <UserSecretsId>3a244026-fe69-4809-b76b-0efadb6f6950</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
