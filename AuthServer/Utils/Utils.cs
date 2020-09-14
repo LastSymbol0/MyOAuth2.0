@@ -30,7 +30,7 @@ namespace AuthServer.Utils
             string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
             int separatorIndex = usernamePassword.IndexOf(':');
-             string login = usernamePassword.Substring(0, separatorIndex);
+            string login = usernamePassword.Substring(0, separatorIndex);
             string password = usernamePassword.Substring(separatorIndex + 1);
 
             return (login, password);
