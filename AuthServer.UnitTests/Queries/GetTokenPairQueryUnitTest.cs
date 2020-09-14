@@ -101,7 +101,7 @@ namespace AuthServer.UnitTests.Queries
         }
 
         [Fact]
-        public async Task Handle_Should_Return_grant_When_session_is_valid()
+        public async Task Handle_Should_Return_token_pair_When_session_is_valid()
         {
             IEnumerable<Claim> claims = new List<Claim>();
             AccessTokenDTO accessToken = new AccessTokenDTO
