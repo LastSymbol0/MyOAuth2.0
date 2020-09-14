@@ -7,7 +7,6 @@ namespace AuthServer.Mediator.Queries
 {
     public class GetClientAuthCodeQuery : IQuery<string>
     {
-        public string ClientId { get; set; }
-        public string ResourceOwnerId { get; set; }
+        public int SessionId { get; set; }
     }
 }

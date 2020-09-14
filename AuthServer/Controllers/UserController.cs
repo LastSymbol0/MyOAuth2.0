@@ -63,8 +63,7 @@ namespace AuthServer.Controllers
             {
                 var code = await Mediator.Get<GetClientAuthCodeQuery, string>(new GetClientAuthCodeQuery
                 {
-                    ClientId = model.ClientInfo.ClientId,
-                    ResourceOwnerId = model.ClientInfo.ResouceOwnerId
+                    SessionId = (int)commandResponce.SessionId
                 });
 
                 return Redirect($"{model.ClientInfo.RedirectUrl}?state={model.ClientInfo.State}&code={code}");

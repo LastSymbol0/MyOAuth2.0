@@ -17,9 +17,7 @@ namespace AuthServer.Mediator.Queries
 
         public async Task<string> Handle(GetClientAuthCodeQuery query)
         {
-            int sessionId = int.Parse($"{query.ClientId}{query.ResourceOwnerId}");
-
-            Session session = SessionsRepository.GetSessionById(sessionId);
+            Session session = SessionsRepository.GetSessionById(query.SessionId);
 
             if (session != null && session.IsValid() && session.Status == SessionStatus.WaitingForClientAuthorization)
             {
