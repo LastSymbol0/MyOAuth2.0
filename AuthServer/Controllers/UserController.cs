@@ -34,7 +34,7 @@ namespace AuthServer.Controllers
         {
             // Tmp resource owner auth
             // TODO: Resource owner's authorization header value must contain token and
-            //       it must be parsed in auth middleware and accessed here via something like User.Id
+            //       it must be parsed and validated in auth middleware and accessed here via something like User.Id
             var (login, pass) = Utils.Utils.GetLoginPasswordFromAuthHeader(authHeader);
 
             RequestCodeClientDTO info = new RequestCodeClientDTO();
@@ -49,7 +49,7 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetAccessToClientAsync(GivingAccessModel model)
+        public async Task<IActionResult> GetAccessToClient(GivingAccessModel model)
         {
             SessionCommandResponce commandResponce = await Mediator.Execute<StartSessionCommand, SessionCommandResponce>(new StartSessionCommand
             {

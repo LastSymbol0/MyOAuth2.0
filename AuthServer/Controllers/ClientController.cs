@@ -38,8 +38,8 @@ namespace AuthServer.Controllers
                                 [FromHeader(Name = "Authorization")] string authHeader)
         {
             // Tmp client auth
-            // TODO: Client's authorization header value must be parsed in auth middleware
-            //       and accessed here via something like User.Id
+            // TODO: Client's authorization header value must be parsed and validated
+            //       in auth middleware and accessed here via something like User.Id
             var (clientId, clientSecret) = Utils.Utils.GetLoginPasswordFromAuthHeader(authHeader);
 
             SessionCommandResponce commandResponce;
